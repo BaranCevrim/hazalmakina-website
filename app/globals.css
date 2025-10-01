@@ -1,26 +1,192 @@
+/* Tailwind base */
 @import "tailwindcss";
 
+/* =========
+   Core Vars
+   ========= */
 :root {
+  /* Light mode temel renkler */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #101316;
+
+  /* Marka renkleri (logo ile uyumlu) */
+  --brand-primary: #ff6a00;  /* turuncu */
+  --brand-secondary:#6f3bdc; /* mor   */
+  --brand-accent: #00b3c8;   /* turkuaz */
+
+  /* Koyu lacivert taban (hero/site arka planları) */
+  --bg-1: #0b1220;
+  --bg-2: #0f1525;
+
+  /* Yüzey ve çizgi tonları */
+  --surface: rgba(255,255,255,.06);
+  --border: rgba(17, 24, 39, .12);
+  --border-inverse: rgba(255,255,255,.12);
+
+  /* Focus rengi (turkuaz) */
+  --focus: rgba(0,179,200,.55);
+
+  /* Grid çizgi opaklığı (light/dark aşağıda override) */
+  --grid-line: rgba(0,0,0,.06);
+
+  /* Radius */
+  --radius: 16px;
 }
 
+/* Tailwind theme bridge */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0d12;
+    --foreground: #e8eaee;
+
+    --surface: rgba(255,255,255,.08);
+    --border: rgba(255,255,255,.10);
+    --border-inverse: rgba(255,255,255,.16);
+
+    /* grid çizgisi koyu zeminde açık */
+    --grid-line: rgba(255,255,255,.08);
   }
 }
 
+/* =========
+   Base
+   ========= */
+* { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+
+/* ÖNEMLİ: background yerine background-color — böylece .bg-site/.bg-hero’yı ezmez */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Link davranışı */
+a { text-underline-offset: 4px; }
+
+/* Focus görünürlüğü */
+:where(a,button,input,textarea,summary,[role="button"]) { outline: none; }
+:where(a,button,input,textarea,summary,[role="button"]):focus-visible {
+  box-shadow: 0 0 0 3px var(--focus);
+  border-radius: 10px;
+}
+
+/* =========
+   Themed Background Helpers
+   ========= */
+
+/* Tüm siteye hafif markalı degrade (layout body’de kullan) */
+.bg-site {
+  /* fallback */
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  /* katmanlı */
+  background:
+    radial-gradient(80rem 40rem at 60% -20%, rgba(255,255,255,.06), transparent),
+    /* mor parıltı */
+    radial-gradient(60rem 30rem at -10% 120%, rgba(111,59,220,.12), transparent),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+
+/* Hero alanı için canlı ama soft görünüm */
+.bg-hero {
+  /* fallback */
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  /* turuncu + turkuaz + mor parıltı */
+  background:
+    radial-gradient(30rem 24rem at 10% -10%, rgba(255,106,0,.22), transparent),
+    radial-gradient(26rem 20rem at 90% 10%, rgba(0,179,200,.22), transparent),
+    radial-gradient(50rem 36rem at 50% 120%, rgba(111,59,220,.18), transparent),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+}
+
+/* Blur blob yardımcıları (Hero içinde kullan) */
+.blob { filter: blur(40px); opacity:.55; }
+
+/* İnce grid (makine parkuru arkasında çok hafif kullanmak için) */
+.bg-faint-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: center;
+  mask-image: radial-gradient(closest-side, #000, transparent);
+  opacity: .25;
+}
+
+/* =========
+   Components
+   ========= */
+
+/* Kart */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem; /* p-5 */
+  transition: border-color .2s ease, transform .2s ease;
+  background: var(--surface);
+}
+.card:hover {
+  border-color: rgba(0,179,200,.65); /* brand-accent */
+  transform: translateY(-1px);
+}
+
+/* Butonlar */
+.btn {
+  border-radius: 10px;
+  border: 1px solid var(--foreground);
+  padding: .5rem 1rem; /* px-4 py-2 */
+  font-size: .875rem;  /* text-sm */
+  font-weight: 600;
+  transition: all .2s ease;
+}
+.btn-outline { color: var(--foreground); background: transparent; }
+.btn-outline:hover { background: var(--foreground); color: var(--background); }
+.btn-solid {
+  border-color: transparent;
+  color: #0b0b0b;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+}
+.btn-solid:hover { filter: brightness(1.05); }
+
+/* Badge (hero’daki “Zamanında Teslim…”) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .25rem .6rem;
+  font-size: .75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-inverse);
+  background: rgba(0,0,0,.30);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* CTA kutusu */
+.cta {
+  border: 1px solid var(--border-inverse);
+  border-radius: 24px;
+  background: linear-gradient(90deg, rgba(111,59,220,.16), rgba(0,179,200,.16));
+}
+
+/* Başlık altı ince vurgu (isteğe bağlı) */
+.h-title-underline { position: relative; display: inline-block; }
+.h-title-underline::after {
+  content: "";
+  position: absolute; left: 0; bottom: -6px;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+  opacity: .6;
+  border-radius: 999px;
 }
